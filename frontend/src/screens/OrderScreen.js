@@ -37,6 +37,21 @@ const OrderScreen = ({ match, history }) => {
   const orderDeliver = useSelector((state) => state.orderDeliver)
   const { loading: loadingDeliver, success: successDeliver } = orderDeliver
 
+  if (!loading) {
+    // calculate prices
+    const addDecimals = (num) => {
+      return (Math.round(num * 100) / 100).toFixed(2)
+    }
+
+    order.itemsPrice = addDecimals(
+      order.orderItems.reduce(
+        (accumulator, currentItem) =>
+          accumulator + currentItem.price * currentItem.qty,
+        0
+      )
+    )
+  }
+
   useEffect(() => {
     if (!userInfo) {
       history.push('/login')
@@ -54,7 +69,7 @@ const OrderScreen = ({ match, history }) => {
       document.body.appendChild(script)
     }
 
-    if (successPay || !order || order._id !== orderId || successDeliver) {
+    if (!order || successPay || successDeliver || order._id !== orderId) {
       dispatch({ type: ORDER_PAY_RESET })
       dispatch({ type: ORDER_DELIVER_RESET })
       dispatch(getOrderDetails(orderId))
@@ -65,22 +80,7 @@ const OrderScreen = ({ match, history }) => {
         setSdkReady(true)
       }
     }
-  }, [order, orderId, dispatch, successPay, successDeliver])
-
-  if (!loading) {
-    // calculate prices
-    const addDecimals = (num) => {
-      return (Math.round(num * 100) / 100).toFixed(2)
-    }
-
-    order.itemsPrice = addDecimals(
-      order.orderItems.reduce(
-        (accumulator, currentItem) =>
-          accumulator + currentItem.price * currentItem.qty,
-        0
-      )
-    )
-  }
+  }, [dispatch, orderId, successPay, successDeliver, order])
 
   const successPaymentHandler = (paymentResult) => {
     console.log(paymentResult)
