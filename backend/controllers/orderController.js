@@ -1,5 +1,4 @@
 import asyncHandler from 'express-async-handler'
-import Product from '../../frontend/src/components/Product.js'
 import Order from '../models/orderModel.js'
 
 // @desc Create new order
@@ -70,12 +69,26 @@ const updateOrderToPaid = asyncHandler(async (req, res) => {
     }
 
     const updatedOrder = await order.save()
-    // decrement the numbers of items in stock after a user paid for it
-    // for (let item of updatedOrder.orderItems) {
-    //   const product = await Product.findById(item.product)
-    //   product.countInStock -= item.qty
-    //   await product.save()
-    // }
+
+    res.json(updatedOrder)
+  } else {
+    res.status(404)
+    throw new Error('Order not found')
+  }
+})
+
+// @desc Update order to delivered
+// @route GET /api/orders/:id/deliver
+// @access Private/Admin
+const updateOrderToDelivered = asyncHandler(async (req, res) => {
+  // get user's id, name and email associated with the order id
+  const order = await Order.findById(req.params.id)
+  if (order) {
+    order.isDelivered = true
+    order.deliveredAt = Date.now()
+
+    const updatedOrder = await order.save()
+
     res.json(updatedOrder)
   } else {
     res.status(404)
@@ -105,6 +118,7 @@ export {
   addOrderItems,
   getOrderById,
   updateOrderToPaid,
+  updateOrderToDelivered,
   getMyOrders,
   getOrders,
 }

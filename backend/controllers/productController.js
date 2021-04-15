@@ -5,9 +5,29 @@ import Product from '../models/productModel.js'
 // @route GET /api/products
 // @access Public
 const getProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find({})
+  // pages. up to 10 products per page
+  const pageSize = 10
+  const page = Number(req.query.pageNumber) || 1
+  // with query, we can get /api?key
+  // i - case insensitive
+  const keyword = req.query.keyword
+    ? {
+        name: {
+          $regex: req.query.keyword,
+          $options: 'i',
+        },
+      }
+    : {}
+  // count # of products
+  const count = await Product.countDocuments({ ...keyword })
+  // seaches for either keyword (limited to the number of products per page)
+  // or empty object - all products
+  // we skip products that do not match if we are not on the right page?
+  const products = await Product.find({ ...keyword })
+    .limit(pageSize)
+    .skip(pageSize * (page - 1))
 
-  res.json(products)
+  res.json({ products, page, pages: Math.ceil(count / pageSize) })
 })
 
 // @desc Fetch a single product
@@ -88,10 +108,60 @@ const updateProduct = asyncHandler(async (req, res) => {
   }
 })
 
+// @desc Create new review
+// @route POST /api/products/:id/reviews
+// @access Private
+const createProductReview = asyncHandler(async (req, res) => {
+  const { rating, comment } = req.body
+  const product = await Product.findById(req.params.id)
+  if (product) {
+    // check if the logged in user has a review on that particular item we are looking at
+    const alreadyReviewed = product.reviews.find(
+      (review) => review.user.toString() === req.user._id.toString()
+    )
+    if (alreadyReviewed) {
+      res.status(400)
+      throw new Error('Product already reviewed')
+    }
+
+    const review = {
+      name: req.user.name,
+      rating: Number(rating),
+      comment,
+      user: req.user._id,
+    }
+    product.reviews.push(review)
+    // update the # of reviews
+    product.numReviews = product.reviews.length
+    // update total rating
+    product.rating =
+      product.reviews.reduce(
+        (accum, currentItem) => currentItem.rating + accum,
+        0
+      ) / product.reviews.length
+    await product.save()
+    res.status(201).json({ message: 'Review added' })
+  } else {
+    res.status(404)
+    throw new Error('Product not found')
+  }
+})
+
+// @desc Get top rated products
+// @route GET /api/products/top
+// @access Public
+const getTopProducts = asyncHandler(async (req, res) => {
+  // sort in an ascending order: -1, and limit to 3 products
+  const products = await Product.find({}).sort({ rating: -1 }).limit(3)
+  res.json(products)
+})
+
 export {
   getProductById,
   getProducts,
   deleteProduct,
   createProduct,
   updateProduct,
+  createProductReview,
+  getTopProducts,
 }

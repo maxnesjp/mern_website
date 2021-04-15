@@ -39,7 +39,7 @@ const OrderListScreen = ({ history }) => {
             <tr>
               <th>ID</th>
               <th>USER</th>
-              <th>DATA</th>
+              <th>DATE</th>
               <th>TOTAL</th>
               <th>PAID</th>
               <th>DELIVERED</th>
@@ -51,12 +51,11 @@ const OrderListScreen = ({ history }) => {
               <tr key={order._id}>
                 <td>{order._id}</td>
                 <td>{order.user && order.user.name}</td>
-                <td>{order.name}</td>
                 <td>{order.createdAt.substring(0, 10)}</td>
                 <td>${order.totalPrice}</td>
                 <td>
                   {order.isPaid ? (
-                    order.PaidAt.substring(0, 10)
+                    order.paidAt.substring(0, 10)
                   ) : (
                     <i className='fas fa-times' style={{ color: 'red' }}></i>
                   )}
@@ -69,7 +68,7 @@ const OrderListScreen = ({ history }) => {
                   )}
                 </td>
                 <td>
-                  <LinkContainer to={`/admin/order/${order._id}`}>
+                  <LinkContainer to={`/order/${order._id}`}>
                     <Button variant='light' className='btn-sm'>
                       Details
                     </Button>
