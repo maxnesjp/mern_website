@@ -6,7 +6,7 @@ import Product from '../models/productModel.js'
 // @access Public
 const getProducts = asyncHandler(async (req, res) => {
   // pages. up to 10 products per page
-  const pageSize = 10
+  const pageSize = 8
   const page = Number(req.query.pageNumber) || 1
   // with query, we can get /api?key
   // i - case insensitive

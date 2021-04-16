@@ -45,7 +45,7 @@ const ProfileScreen = ({ location, history }) => {
         setEmail(user.email)
       }
     }
-  }, [history, userInfo, dispatch, user, success])
+  }, [history, userInfo, dispatch, user, success, orders])
 
   const submitHandler = (e) => {
     // prevent refresh

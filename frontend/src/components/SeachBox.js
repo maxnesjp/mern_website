@@ -15,16 +15,20 @@ const SeachBox = ({ history }) => {
   }
 
   return (
-    <Form onSubmit={submitHandler} inline>
+    <Form onSubmit={submitHandler} inline className='search-form-custom'>
       {/* mr-sm-2 : margin right on small screens */}
       <Form.Control
+        htmlSize='30'
         type='text'
         name='q'
         onChange={(e) => setKeyword(e.target.value)}
         placeholder='Search Products...'
-        className='mr-sm-2 ml-sm-5'
       ></Form.Control>
-      <Button type='submit' variant='outline-success' className='p-2'>
+      <Button
+        type='submit'
+        variant='outline-warning'
+        className='search-form-button-custom'
+      >
         Search
       </Button>
     </Form>
