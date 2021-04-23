@@ -18,6 +18,7 @@ const SeachBox = ({ history }) => {
     <Form onSubmit={submitHandler} inline className='search-form-custom'>
       {/* mr-sm-2 : margin right on small screens */}
       <Form.Control
+        className='form-control-seach-box'
         htmlSize='30'
         type='text'
         name='q'
@@ -27,7 +28,7 @@ const SeachBox = ({ history }) => {
       <Button
         type='submit'
         variant='outline-warning'
-        className='search-form-button-custom'
+        className='search-form-button-custom form-control-seach-box'
       >
         Search
       </Button>
